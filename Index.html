@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Meloditos 🎶 — Juego infantil</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">🎶</div>
+      <h1>Meloditos</h1>
+    </div>
+    <div class="player-info">
+      <button id="btnStart">Iniciar sesión niño</button>
+      <div id="childInfo" class="hidden"></div>
+    </div>
+  </header>
+
+  <main>
+    <aside class="left-panel">
+      <div class="panel">
+        <h3>🎓 Modo Maestro</h3>
+        <label class="switch">
+          <input id="masterToggle" type="checkbox">
+          <span class="slider"></span>
+        </label>
+        <p class="muted">Al activar, se registran las partidas.</p>
+        <button id="exportCsv" class="btn">Exportar CSV</button>
+      </div>
+
+      <div class="panel">
+        <h3>📋 Log (últimos 5 intentos)</h3>
+        <div id="attemptCounter">Intentos registrados: 0</div>
+        <table id="recentTable" class="recent-table">
+          <thead><tr><th>Niño</th><th>Nivel</th><th>Objetivo</th><th>Resp</th><th>Res</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="panel help">
+        <h3>✅ Ayuda rápida</h3>
+        <p>Controles básicos: pulmón del piano → pulsa las teclas A..H. El juego usará WebAudio.</p>
+      </div>
+    </aside>
+
+    <section class="game-area">
+      <div class="top-row">
+        <div class="level-card">
+          <div>👦 <span id="displayName">—</span> • Edad: <span id="displayAge">—</span></div>
+          <div>Nivel: <span id="level">1</span></div>
+          <div>Puntos: <span id="score">0</span> / 20</div>
+        </div>
+
+        <div class="status-card">
+          <div>Vidas: <span id="lives">5</span></div>
+          <div>Intentos rest.: <span id="attempts">5</span></div>
+          <div id="feedback" class="feedback">¡Bienvenido!</div>
+        </div>
+      </div>
+
+      <div class="lanes" id="lanes">
+        <!-- Contenedor para las notas que caen; se posicionan absolutamente respecto a este contenedor -->
+        <div id="fallArea" class="fall-area"></div>
+        <div class="target-line">▶ Línea de toque</div>
+      </div>
+
+      <div class="piano" id="piano">
+        <button class="key" data-letter="A">A<br><small>Do</small></button>
+        <button class="key" data-letter="B">B<br><small>Re</small></button>
+        <button class="key" data-letter="C">C<br><small>Mi</small></button>
+        <button class="key" data-letter="D">D<br><small>Fa</small></button>
+        <button class="key" data-letter="E">E<br><small>Sol</small></button>
+        <button class="key" data-letter="F">F<br><small>La</small></button>
+        <button class="key" data-letter="G">G<br><small>Si</small></button>
+        <button class="key" data-letter="H">H<br><small>Do'</small></button>
+      </div>
+
+      <div class="controls">
+        <div class="controls-left">
+          <button id="btnPlayRound" class="btn primary">Reproducir objetivo</button>
+          <button id="btnNext" class="btn">Siguiente</button>
+          <button id="btnReset" class="btn">Reiniciar nivel</button>
+        </div>
+
+        <div class="controls-right">
+          <label for="modeSelect">Modo:</label>
+          <select id="modeSelect">
+            <option value="1">Nivel 1 - Reconocimiento</option>
+            <option value="2">Nivel 2 - Secuencia corta</option>
+            <option value="3">Nivel 3 - Ritmo</option>
+            <option value="4">Nivel 4 - Melodías</option>
+            <option value="5">Nivel 5 - Libre / Grabador</option>
+          </select>
+
+          <label for="ageScale">Edad:</label>
+          <input type="range" id="ageScale" min="3" max="7" value="5" />
+        </div>
+      </div>
+
+      <div id="recorder" class="recorder hidden">
+        <div>Modo libre — Grabación (máx 8 notas)</div>
+        <div id="recordedList"></div>
+        <button id="btnStartRecord" class="btn">Grabar</button>
+        <button id="btnStopRecord" class="btn">Parar</button>
+        <button id="btnPlayRecording" class="btn">Reproducir grabación</button>
+        <div class="muted">Duración máxima: 8 notas</div>
+      </div>
+    </section>
+
+    <aside class="right-panel">
+      <div class="panel illustration">
+        <div class="mascot">🐻</div>
+        <div class="illustration-block" id="illustrationBlock"></div>
+      </div>
+
+      <div class="panel rewards">
+        <h3>⭐ Recompensas</h3>
+        <div id="starsArea" class="stars-area">—</div>
+        <div id="trophies">Trofeos: <span id="trophyCount">0</span></div>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    <small>Meloditos — Diseñado para niños 3–7 años • Compatible con navegadores modernos</small>
+  </footer>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Datos del niño</h2>
+      <label>Nombre:<input id="inputName" /></label>
+      <label>Edad:
+        <select id="inputAge">
+          <option>3</option><option>4</option><option>5</option><option>6</option><option>7</option>
+        </select>
+      </label>
+      <div class="modal-actions">
+        <button id="modalSave" class="btn primary">Guardar</button>
+        <button id="modalCancel" class="btn">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <template id="starTemplate">
+    <div class="star-anim"></div>
+  </template>
+<!-- Mostrar nombre de la melodía seleccionada -->
+<div id="melodyNameDisplay" style="text-align:center;font-weight:bold;color:#444;margin-top:6px;">—</div>
+  <script src="app.js" defer></script>
+</body>
+</html>
